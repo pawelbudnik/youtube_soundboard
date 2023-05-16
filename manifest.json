@@ -4,16 +4,13 @@
   "name": "Youtube Soundboard",
   "description": "Bind and play sounds at any time in your browser",
   "background": {
-    "service_worker": "background.js"
+    "service-worker": ["background.js"]
   },
   "action": {
     "default_popup": "popup.html"
   },
   "permissions": ["storage"],
-  "host_permissions": [
-    "https://developer.chrome.com/*"
-  ],
-  
+
   "commands": {
     "_execute_action": {
       "suggested_key": {

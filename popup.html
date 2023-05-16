@@ -4,23 +4,22 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./popup.css" />
+    <link href="/dist/output.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
   </head>
   <body>
-
-    <h3>Youtube Soundboard</h3>
-    <h4>Add a sound:</h4>
-      <label>Name</label>
-      <input type="text" placeholder="Sound name"></input>
-
-      <label>key-bind</label>
-      <button id="bindButton">Click to Set Keybind</button>
-      <button id="clearButton">X</button>
-
-      <label>url</label>
-      <input id="videoInput" type="text" placeholder="enter YT url"></input>
-      <button id="addButton">+</button>
-
+    
+    <h3 class="p-4 text-xl font-bold">Youtube Soundboard</h3>
+    
+    <div class="p-4 w-max">
+      <label class="p-1 text-lg font-bold flex">Add a sound:</label>
+      <input id="soundName" type="text" placeholder="Sound name" class="border-2 rounded-lg p-2 flex-1 border-gray-300"></input>
+      <button id="bindButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Set Keybind</button>
+      <input id="videoInput" type="text" placeholder="enter YT url" class="border-2 rounded-lg p-2 flex-1 border-gray-300"></input>
+      <button id="addButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add</button>
+      <div id="buttonContainer"></div>
+    </div>
+    
     <script src="./scripts/content.js" type="module"></script>
   </body>
 </html>
