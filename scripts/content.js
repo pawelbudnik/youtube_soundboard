@@ -3,8 +3,10 @@ const container = document.getElementById('buttonContainer');
 const bindButton = document.getElementById('bindButton');
 const addButton = document.getElementById('addButton');
 const videoInput = document.getElementById('videoInput');
+let youtubeIframe = null;
 let keybind = null;
 let isListening = false;
+let isPlaying = false;
 
 // Function to initialize the extension
 function initializeExtension() {
@@ -14,10 +16,11 @@ function initializeExtension() {
 
 // Function to handle the play button click event
 function handlePlayButtonClick(buttonObject) {
-  const iframe = document.createElement('iframe');
-  iframe.src = `https://www.youtube.com/embed/${buttonObject.videoId}?autoplay=1`;
-  iframe.style.display = 'none';
-  document.body.appendChild(iframe);
+  youtubeIframe = document.createElement('iframe');
+  youtubeIframe.id = 'youtubeIframe'; // Assign the ID to the iframe element
+  youtubeIframe.src = `https://www.youtube.com/embed/${buttonObject.videoId}?autoplay=1`;
+  youtubeIframe.style.display = 'none';
+  document.body.appendChild(youtubeIframe);
 }
 
 // Function to render the buttons
@@ -38,17 +41,44 @@ function renderButtons() {
     soundNameText.classList.add('sound-name');
     circleButton.appendChild(soundNameText);
 
-    circleButton.addEventListener('click', function() {
-      handlePlayButtonClick(buttonObject);
+    // play/pause button
+    const playPauseButton = document.createElement('button');
+    playPauseButton.classList.add('play-pause-button');
+    playPauseButton.innerText = '▶️';
+
+    playPauseButton.addEventListener('click', function() {
+      togglePlay();
     });
 
+    function togglePlay() {
+      if (!isPlaying) {
+        playPauseButton.innerText = '⏹';
+        play();
+      } else {
+        playPauseButton.innerText = '▶️';
+        pause();
+      }
+    }
+
+    function play() {
+      isPlaying = true;
+      handlePlayButtonClick(buttonObject);
+    }
+
+    function pause() {
+      isPlaying = false;
+      youtubeIframe.src = null;
+    }
+
+    // remove button
     const removeButton = document.createElement('button');
-    removeButton.innerText = 'Remove';
+    removeButton.innerText = 'X';
     removeButton.classList.add('remove-button');
     removeButton.addEventListener('click', function() {
       handleRemoveButtonClick(index);
     });
 
+    circleButton.appendChild(playPauseButton);
     circleButton.appendChild(removeButton);
     container.appendChild(circleButton);
   });
@@ -57,6 +87,7 @@ function renderButtons() {
 function handleRemoveButtonClick(index) {
   buttonsArray.splice(index, 1);
   chrome.storage.local.set({ buttonsArray: buttonsArray });
+  youtubeIframe.src = null;
   renderButtons();
 }
 
@@ -105,7 +136,7 @@ function bindEventListeners() {
     const buttonObject = {
       soundName: soundName,
       keybind: keybind,
-      videoId: videoId
+      videoId: videoId,
     };
 
     buttonsArray.push(buttonObject);
