@@ -1,3 +1,8 @@
+.header-icon {
+  margin-right: 0.5rem; /* Adjust the spacing as needed */
+  color: #ff0000;
+}
+
 .button-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, 75px);
@@ -7,65 +12,57 @@
 }
 
 .circle-button {
-  position: relative; /* Added position */
+  position: relative;
   width: 75px;
   height: 75px;
-  border-radius: 10px; /* Changed border-radius */
-  background-color: #888;
+  border-radius: 10px;
+  background-color: #3b82f6;
   color: #fff;
   margin: 10px;
   cursor: pointer;
 }
 
 .sound-name {
-  position: absolute; /* Added position */
-  top: 5px; /* Adjusted position */
-  left: 5px; /* Adjusted position */
-  width: 100%; /* Added width */
+  position: absolute;
+  top: 5px;
+  left: 0px;
+  width: 100%;
+  text-transform: uppercase;
+  font-weight: bold;
   text-align: center;
 }
 
 .key-bind {
-  position: absolute; /* Added position */
-  top: 50%; /* Adjusted position */
-  left: 50%; /* Adjusted position */
-  transform: translate(-50%, -50%); /* Centered horizontally and vertically */
+  position: absolute;
+  transform: translate(-50%, -50%);
   text-align: center;
 }
 
 .play-pause-button {
-  position: absolute; /* Added position */
-  bottom: -0px; /* Adjusted position */
-  left: 10px; /* Adjusted position */
-  width: 20px; /* Added width */
-  height: 20px; /* Added height */
+  position: absolute;
+  bottom: 7px;
+  left: 17px;
   cursor: pointer;
+  transform: scale(2);
 }
 
-.rewind-button {
-  position: absolute; /* Added position */
-  bottom: -15px; /* Adjusted position */
-  right: -15px; /* Adjusted position */
-  width: 20px; /* Added width */
-  height: 20px; /* Added height */
-  background-color: red;
-  border-radius: 10px;
-  border: none;
-  color: #fff;
-  font-weight: bold;
+.showIframe-button {
+  position: absolute;
+  bottom: -0px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
 }
 
 .remove-button {
-  position: absolute; /* Added position */
-  bottom: -15px; /* Adjusted position */
-  right: -15px; /* Adjusted position */
-  width: 20px; /* Added width */
-  height: 20px; /* Added height */
+  position: absolute;
+  bottom: -12px;
+  right: -12px;
+  width: 20px;
+  height: 20px;
   background-color: red;
   border-radius: 10px;
-  border: none;
-  color: #fff;
   font-weight: bold;
   cursor: pointer;
 }

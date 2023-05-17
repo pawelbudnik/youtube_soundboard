@@ -3,37 +3,29 @@ const container = document.getElementById('buttonContainer');
 const bindButton = document.getElementById('bindButton');
 const addButton = document.getElementById('addButton');
 const videoInput = document.getElementById('videoInput');
-let youtubeIframe = null;
 let keybind = null;
+let isBinding = false;
 let isListening = false;
-let isPlaying = false;
+// let showIframe = false;
 
-// Function to initialize the extension
+// Initialize the extension
 function initializeExtension() {
   loadButtonsFromStorage();
   bindEventListeners();
 }
 
-// Function to handle the play button click event
-function handlePlayButtonClick(buttonObject) {
-  youtubeIframe = document.createElement('iframe');
-  youtubeIframe.id = 'youtubeIframe'; // Assign the ID to the iframe element
-  youtubeIframe.src = `https://www.youtube.com/embed/${buttonObject.videoId}?autoplay=1`;
-  youtubeIframe.style.display = 'none';
-  document.body.appendChild(youtubeIframe);
-}
-
-// Function to render the buttons
+// Render the buttons
 function renderButtons() {
   container.innerHTML = '';
   container.classList.add('button-container');
 
   buttonsArray.forEach(function(buttonObject, index) {
+    console.log("bo: " , buttonObject);
     const circleButton = document.createElement('button');
     circleButton.classList.add('circle-button');
 
     const keybindText = document.createElement('span');
-    keybindText.innerText = buttonObject.keybind ? `(${buttonObject.keybind})` : '';
+    keybindText.innerText = buttonObject.keybind ? `# ${buttonObject.keybind}` : '';
     circleButton.appendChild(keybindText);
 
     const soundNameText = document.createElement('span');
@@ -41,57 +33,78 @@ function renderButtons() {
     soundNameText.classList.add('sound-name');
     circleButton.appendChild(soundNameText);
 
-    // play/pause button
     const playPauseButton = document.createElement('button');
     playPauseButton.classList.add('play-pause-button');
-    playPauseButton.innerText = '▶️';
+    playPauseButton.innerHTML = buttonObject.isPlaying ? `<span class="header-icon"><i class="fa-sharp fa-solid fa-circle-stop"></i></span>` : `<span class="header-icon"><i class="fab fa-youtube"></i></span>`;
 
     playPauseButton.addEventListener('click', function() {
-      togglePlay();
-    });
-
-    function togglePlay() {
-      if (!isPlaying) {
-        playPauseButton.innerText = '⏹';
+      if (!buttonObject.isPlaying) {
+        playPauseButton.innerHTML = `<span class="header-icon"><i class="fa-sharp fa-solid fa-circle-stop"></i></span>`;
         play();
       } else {
-        playPauseButton.innerText = '▶️';
+        playPauseButton.innerHTML = `<span class="header-icon"><i class="fab fa-youtube"></i></span>`;
         pause();
       }
-    }
-
-    function play() {
-      isPlaying = true;
-      handlePlayButtonClick(buttonObject);
-    }
-
-    function pause() {
-      isPlaying = false;
-      youtubeIframe.src = null;
-    }
+    });
 
     // remove button
     const removeButton = document.createElement('button');
     removeButton.innerText = 'X';
     removeButton.classList.add('remove-button');
+
     removeButton.addEventListener('click', function() {
-      handleRemoveButtonClick(index);
+      buttonsArray[index].iframe.src = {};
+      buttonsArray.splice(index, 1);
+      chrome.storage.local.set({ buttonsArray: buttonsArray });
+
+      console.log("button is playing before: ", buttonsArray);
+      console.log("index " , index);
+      
+      // buttonsArray[index].buttonObject = false;
+
+
+
+      renderButtons();
+
     });
+
+    // TODO: Show more advanced controls with iframe for currently played sound.
+    // Show iframe button
+    // const showIframeButton = document.createElement('button');
+    // showIframeButton.classList.add('showIframe-button');
+    // showIframeButton.innerText = '🎬';
+
+    // showIframeButton.addEventListener('click', function() {
+    //   handleShowIframe(buttonObject);
+    // });
+
+    function play() {
+      buttonObject.isPlaying = true;
+      buttonObject.iframe = document.createElement('iframe');
+      buttonObject.iframe.id = 'youtubeIframe'; // Assign the ID to the iframe element
+      buttonObject.iframe.src = `https://www.youtube.com/embed/${buttonObject.videoId}?autoplay=1`;
+      buttonObject.iframe.style.display = 'none'; // showIframe ? 'true' : 'none'
+      document.body.appendChild(buttonObject.iframe);
+    }
+
+    function pause() {
+      buttonObject.isPlaying = false;
+      buttonObject.iframe.src = null;
+    }
 
     circleButton.appendChild(playPauseButton);
     circleButton.appendChild(removeButton);
+    // circleButton.appendChild(showIframeButton);
     container.appendChild(circleButton);
   });
 }
 
-function handleRemoveButtonClick(index) {
-  buttonsArray.splice(index, 1);
-  chrome.storage.local.set({ buttonsArray: buttonsArray });
-  youtubeIframe.src = null;
-  renderButtons();
-}
+// TODO: show iframe controls 
+// function handleShowIframe(buttonObject) {
 
-// Function to load buttons from storage
+// }
+
+// Load buttons from storage
 function loadButtonsFromStorage() {
   chrome.storage.local.get('buttonsArray', function(result) {
     if (result.buttonsArray) {
@@ -122,7 +135,7 @@ function bindEventListeners() {
   // Function to handle the button click event
   function handleBindClick() {
     if (!isListening) {
-      bindButton.innerText = 'Listening for the key';
+      bindButton.innerText = 'Press any key';
       document.addEventListener('keydown', handleKeyDown);
       isListening = true;
     }
@@ -137,6 +150,9 @@ function bindEventListeners() {
       soundName: soundName,
       keybind: keybind,
       videoId: videoId,
+      iframe: {},
+      isPlaying: false
+      // showIframe: showIframe,
     };
 
     buttonsArray.push(buttonObject);
