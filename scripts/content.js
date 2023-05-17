@@ -59,11 +59,12 @@ function renderButtons() {
     circleButton.classList.add('circle-button');
 
     const keybindText = document.createElement('span');
-    keybindText.innerText = buttonObject.keybind ? `# ${buttonObject.keybind}` : '';
+    keybindText.classList.add('key-bind');
+    keybindText.innerText = buttonObject.keybind ? `🔗 ${buttonObject.keybind}` : '';
     circleButton.appendChild(keybindText);
 
     const soundNameText = document.createElement('span');
-    soundNameText.innerText = buttonObject.soundName;
+    soundNameText.innerText = buttonObject.soundName.length > 20 ? buttonObject.soundName.substring(0, 17) + '...' : buttonObject.soundName;
     soundNameText.classList.add('sound-name');
     circleButton.appendChild(soundNameText);
 
