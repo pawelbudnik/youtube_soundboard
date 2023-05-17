@@ -1,3 +1,5 @@
+// TODO: 1. Allow for multiple files to play at the same time toggle button. if off, only one file playing allowed.
+
 let buttonsArray = [];
 const container = document.getElementById('buttonContainer');
 const bindButton = document.getElementById('bindButton');
@@ -8,19 +10,49 @@ let isBinding = false;
 let isListening = false;
 // let showIframe = false;
 
-// Initialize the extension
 function initializeExtension() {
   loadButtonsFromStorage();
   bindEventListeners();
+  addKeydownEventListener();
 }
 
-// Render the buttons
+function addKeydownEventListener() {
+  document.addEventListener('keydown', function(event) {
+    const key = event.key.toLowerCase();
+    const buttonObject = buttonsArray.find(button => button.keybind && button.keybind.toLowerCase() === key);
+
+    if (buttonObject && !isBinding) {
+      if (!buttonObject.isPlaying) {
+        play(buttonObject);
+      } else {
+        pause(buttonObject);
+      }
+
+      renderButtons();
+    }
+  });
+}
+
+function play(buttonObject) {
+  buttonObject.isPlaying = true;
+  buttonObject.iframe = document.createElement('iframe');
+  buttonObject.iframe.id = 'youtubeIframe';
+  buttonObject.iframe.src = `https://www.youtube.com/embed/${buttonObject.videoId}?autoplay=1`;
+  buttonObject.iframe.style.display = 'none';
+  document.body.appendChild(buttonObject.iframe);
+  renderButtons();
+}
+
+function pause(buttonObject) {
+  buttonObject.isPlaying = false;
+  buttonObject.iframe.src = null;
+}
+
 function renderButtons() {
   container.innerHTML = '';
   container.classList.add('button-container');
 
   buttonsArray.forEach(function(buttonObject, index) {
-    console.log("bo: " , buttonObject);
     const circleButton = document.createElement('button');
     circleButton.classList.add('circle-button');
 
@@ -38,16 +70,16 @@ function renderButtons() {
     playPauseButton.innerHTML = buttonObject.isPlaying ? `<span class="header-icon"><i class="fa-sharp fa-solid fa-circle-stop"></i></span>` : `<span class="header-icon"><i class="fab fa-youtube"></i></span>`;
 
     playPauseButton.addEventListener('click', function() {
-      if (!buttonObject.isPlaying) {
-        playPauseButton.innerHTML = `<span class="header-icon"><i class="fa-sharp fa-solid fa-circle-stop"></i></span>`;
-        play();
+      if(buttonObject.videoId == null) {
+        playPauseButton.innerHTML = `<span title="The provided URL is incorrect 😥 or something else went wrong 🤷‍♂️">💥</span>`;
+      } else if (!buttonObject.isPlaying) {
+        play(buttonObject);
       } else {
         playPauseButton.innerHTML = `<span class="header-icon"><i class="fab fa-youtube"></i></span>`;
-        pause();
+        pause(buttonObject);
       }
     });
 
-    // remove button
     const removeButton = document.createElement('button');
     removeButton.innerText = 'X';
     removeButton.classList.add('remove-button');
@@ -56,19 +88,10 @@ function renderButtons() {
       buttonsArray[index].iframe.src = {};
       buttonsArray.splice(index, 1);
       chrome.storage.local.set({ buttonsArray: buttonsArray });
-
-      console.log("button is playing before: ", buttonsArray);
-      console.log("index " , index);
-      
-      // buttonsArray[index].buttonObject = false;
-
-
-
       renderButtons();
-
     });
 
-    // TODO: Show more advanced controls with iframe for currently played sound.
+    // TODO*: Show more advanced controls with iframe for currently played sound.
     // Show iframe button
     // const showIframeButton = document.createElement('button');
     // showIframeButton.classList.add('showIframe-button');
@@ -77,20 +100,6 @@ function renderButtons() {
     // showIframeButton.addEventListener('click', function() {
     //   handleShowIframe(buttonObject);
     // });
-
-    function play() {
-      buttonObject.isPlaying = true;
-      buttonObject.iframe = document.createElement('iframe');
-      buttonObject.iframe.id = 'youtubeIframe'; // Assign the ID to the iframe element
-      buttonObject.iframe.src = `https://www.youtube.com/embed/${buttonObject.videoId}?autoplay=1`;
-      buttonObject.iframe.style.display = 'none'; // showIframe ? 'true' : 'none'
-      document.body.appendChild(buttonObject.iframe);
-    }
-
-    function pause() {
-      buttonObject.isPlaying = false;
-      buttonObject.iframe.src = null;
-    }
 
     circleButton.appendChild(playPauseButton);
     circleButton.appendChild(removeButton);
@@ -104,7 +113,6 @@ function renderButtons() {
 
 // }
 
-// Load buttons from storage
 function loadButtonsFromStorage() {
   chrome.storage.local.get('buttonsArray', function(result) {
     if (result.buttonsArray) {
@@ -114,34 +122,40 @@ function loadButtonsFromStorage() {
   });
 }
 
-// Function to bind event listeners
 function bindEventListeners() {
-  // Regex function to extract video ID from the URL
   function extractVideoId(url) {
     const regExp = /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?.*v=([a-zA-Z0-9_-]{11}).*/;
     const match = url.match(regExp);
     return match && match.length === 2 ? match[1] : null;
   }
 
-  // Function to handle the keydown event
+  // TODO: only bind to a key that is not already bound.
   function handleKeyDown(event) {
     event.preventDefault();
-    keybind = event.key;
-    bindButton.innerText = `Bound to "${keybind}"`;
-    document.removeEventListener('keydown', handleKeyDown);
-    isListening = false;
-  }
+    const pressedKey = event.key.toLowerCase();
+    
+    const isKeyAlreadyBound = buttonsArray.some(button => button.keybind && button.keybind.toLowerCase() === pressedKey);
+  
+    if (!isKeyAlreadyBound) {
+      keybind = pressedKey;
+      bindButton.innerText = `Bound to "${keybind}"`;
+      document.removeEventListener('keydown', handleKeyDown);
+      isListening = false;
+      isBinding = false;
+    } else {
+      alert('This 🎹 is already bound. Please 👇 another 🎹');
+    }
+  }  
 
-  // Function to handle the button click event
   function handleBindClick() {
     if (!isListening) {
       bindButton.innerText = 'Press any key';
       document.addEventListener('keydown', handleKeyDown);
       isListening = true;
+      isBinding = true;
     }
   }
 
-  // Function to handle the add button click event
   function handleAddButtonClick() {
     const soundName = document.getElementById('soundName').value;
     const videoId = extractVideoId(videoInput.value);
@@ -160,10 +174,8 @@ function bindEventListeners() {
     renderButtons();
   }
 
-  // Attach event listeners to the buttons
   bindButton.addEventListener('click', handleBindClick);
   addButton.addEventListener('click', handleAddButtonClick);
 }
 
-// Initialize the extension
 initializeExtension();
