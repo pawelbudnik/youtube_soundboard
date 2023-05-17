@@ -8,12 +8,14 @@ const videoInput = document.getElementById('videoInput');
 let keybind = null;
 let isBinding = false;
 let isListening = false;
+let initIsPlaying = false;
 // let showIframe = false;
 
 function initializeExtension() {
   loadButtonsFromStorage();
   bindEventListeners();
   addKeydownEventListener();
+  renderButtons();
 }
 
 function addKeydownEventListener() {
@@ -165,7 +167,7 @@ function bindEventListeners() {
       keybind: keybind,
       videoId: videoId,
       iframe: {},
-      isPlaying: false
+      isPlaying: initIsPlaying
       // showIframe: showIframe,
     };
 

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "version": "1.0",
   "name": "Youtube Soundboard",
-  "description": "Bind and play sounds at any time in your browser",
+  "description": "Bind and play youtube sounds at any time in your browser without the videos",
   "background": {
     "service-worker": ["background.js"]
   },
