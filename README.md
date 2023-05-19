@@ -10,7 +10,7 @@
   <h3 align="center">YouTube Soundboard</h3>
 
   <p align="center">
-    🎶 for listening to youtube without the videos and easily switching between different tunes with mouse / keyboard 🎶
+    🎶 Listen to youtube without the videos and easily switch between different tunes with mouse / keyboard 🎶
     <br />
     <br />
     <br />
